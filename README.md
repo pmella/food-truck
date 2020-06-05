@@ -74,5 +74,23 @@ Node.js
 2. Include filters by food category (Chinese, American, Mexican, Chilean, Etc.)
 
 
+## Prerequisites
+1. Java SDK 8
+2. Apache maven (for development purposes)
+
+## How to execute it locally
+1. Clone the project from this git repo 
+```
+git clone https://github.com/pmella/food-truck.git
+```
+2. install the application with the following command:
+```
+mvn clean install
+```
+3. execute the following command:
+```
+java -jar target/foodtruck-0.0.1-SNAPSHOT.jar
+```
+
 
 

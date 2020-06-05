@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org"> 
+  <head>
+    <style>
+       /* Set the size of the div element that contains the map */
+      #map {
+        height: 400px;  /* The height is 400 pixels */
+        width: 100%;  /* The width is the width of the web page */
+       }
+    </style>
+  </head>
+  <body>
+    <h3>Food Trucks Locator</h3>
+
+    <div id="floating-panel">
+      <input onclick="deleteMarkers();" type=button value="Delete Markers">
+    </div>
+    
+    <!--The div element for the map -->
+    <div id="map"></div>
+    <script th:inline="javascript">
+// Initialize and add the map
+
+var map;
+var markers = [];
+
+  function initMap() {
+    // The location of San Francisco
+    var vertex = {lat: /*[[${defaultLatitude}]]*/, lng: /*[[${defaultLongitude}]]*/};
+    // The map, centered at vertex
+    map = new google.maps.Map(
+      document.getElementById('map'), {zoom: 15, center: vertex});
+  
+    map.addListener('click', function(event) {
+          addMarker(event.latLng);
+        });
+  }
+
+  function addMarker(location) {
+    deleteMarkers();
+    var marker = new google.maps.Marker({
+      position: location,
+      map: map,
+      title: 'You are Here!'
+    });
+
+    markers.push(marker);
+
+    fetch('http://localhost:8080/get5NearbyFoodTrucks?latitude=' + location.lat() +'&longitude=' + location.lng())
+  .then(response => response.json())
+  .then(json => {
+    
+    console.log(json)
+
+    for(i = 0; i < 5; i++){
+      var pos =  {lat: Number(json[i]['Latitude']), lng: Number(json[i]['Longitude'])};
+      var option = new google.maps.Marker({
+        position: pos,
+        map: map,
+        icon: {
+        url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+        },
+        title: json[i]['Applicant']
+      });
+      markers.push(option);
+      }});
+
+
+   
+  }
+
+
+  function placeMarker(location) {
+    
+    var marker = new google.maps.Marker({
+        position: location, 
+        map: map
+    });
+
+    
+  }
+
+  function setMapOnAll(map) {
+    for (var i = 0; i < markers.length; i++) {
+      markers[i].setMap(map);
+    }
+  }
+
+  function clearMarkers() {
+    setMapOnAll(null);
+  }
+
+  function deleteMarkers() {
+    clearMarkers();
+    markers = [];
+  }
+
+    </script>
+    <!--Load the API from the specified URL
+    * The async attribute allows the browser to render the page while the API loads
+    * The key parameter will contain your own API key (which is not needed for this tutorial)
+    * The callback parameter executes the initMap() function
+    -->
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCvBzIs2v_CReYEQ3woVHJlZLgo22UwMVw&callback=initMap">
+    </script>
+  </body>
+</html>
